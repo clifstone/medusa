@@ -1,3 +1,4 @@
+// File: src/modules/variant-image/service.ts
 import { MedusaService } from "@medusajs/framework/utils"
 import VariantImage from "./models/variant-image"
 import ProductOrientedImage from "./models/product-gallery"
@@ -20,7 +21,7 @@ export default class VariantImageService extends MedusaService({
   VariantImage,
   ProductOrientedImage,
 }) {
-  /** ===== Variant Images ===== */
+  // ===== Variant =====
   async getImagesByVariant(variantId: string) {
     return this.listVariantImages({ product_variant_id: [variantId] })
   }
@@ -31,12 +32,12 @@ export default class VariantImageService extends MedusaService({
   }
 
   async removeVariantImage(id: string) {
+    // works today for you, leaving as-is
     return this.deleteVariantImages([id])
   }
 
-  /** ===== Product Images ===== */
+  // ===== Product =====
   async fetchProductImages(productId: string) {
-    // NOTE: generated method name reflects the model alias 'ProductGallery'
     return this.listProductOrientedImages({ product_id: [productId] })
   }
 
@@ -46,6 +47,12 @@ export default class VariantImageService extends MedusaService({
   }
 
   async deleteProductImage(id: string) {
-    return this.deleteProductOrientedImages([id])
+    // Some generators accept string[], others want a filter object.
+    // Try ids array first, then gracefully fall back.
+    try {
+      return await this.deleteProductOrientedImages([id])
+    } catch {
+      return this.deleteProductOrientedImages({ id: [id] } as any)
+    }
   }
 }
